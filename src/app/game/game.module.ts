@@ -6,6 +6,8 @@ import { MaterialModule } from '../material/material.module';
 import { GameComponent } from './pages/game/game.component';
 import { GameoverComponent } from './pages/gameover/gameover.component';
 import { PokemonViewComponent } from './components/pokemon-view/pokemon-view.component';
+import { HabilitatsAramMateosComponent } from './components/habilitats-aram-mateos/habilitats-aram-mateos.component';
+import { HttpClientModule} from "@angular/common/http";
 
 
 
@@ -13,12 +15,14 @@ import { PokemonViewComponent } from './components/pokemon-view/pokemon-view.com
   declarations: [
     GameComponent,
     GameoverComponent,
-    PokemonViewComponent
+    PokemonViewComponent,
+    HabilitatsAramMateosComponent
   ],
   imports: [
     CommonModule,
     GameRoutingModule,
-    MaterialModule
+    MaterialModule,
+    HttpClientModule
   ]
 })
 export class GameModule { }

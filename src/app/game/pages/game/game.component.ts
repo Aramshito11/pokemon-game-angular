@@ -3,6 +3,7 @@ import { getRandomItem } from 'src/app/helpers/random.helper';
 import { Pokemon } from '../../interfaces/pokemon.interface';
 import { PlayerService } from '../../services/player.service';
 import { PokemonService } from '../../services/pokemon.service';
+import {HttpClient} from "@angular/common/http";
 
 @Component({
   selector: 'app-game',
@@ -16,11 +17,14 @@ export class GameComponent implements OnInit {
   private _pokemonSelected: string = '';
   private _pokemons: Pokemon[] = [];
   private _pokemon!: Pokemon;
+  public nom: string | undefined;
+  public habilitat: Array<any>  = []
+  public desc: Array<any> = [];
 
   get score(): number {
     return this.playerService.score;
   }
-  
+
   get hearts(): Array<any> {
     return Array(this.playerService.lifes);
   }
@@ -48,7 +52,8 @@ export class GameComponent implements OnInit {
 
   constructor(
     private playerService: PlayerService,
-    private pokemonService: PokemonService
+    private pokemonService: PokemonService,
+    private http:HttpClient
   ) { }
 
   ngOnInit(): void {
@@ -56,7 +61,19 @@ export class GameComponent implements OnInit {
     this.newGame();
   }
 
-  onSelect(pokemonName: string) {
+  async promesaPokemonHabilitat(nom: any): Promise<any>{
+    const link=`https://pokeapi.co/api/v2/ability`
+    const url = `${link}/${nom}/`;
+    let promise = new Promise((resolve, reject)=>{
+      let Observable$ = this.http.get<any>(url).subscribe({
+        next:(data)=> {resolve(data)},
+        error: (e) => {reject(e)}
+      })
+    })
+    return promise
+  }
+
+  async onSelect(pokemonName: string) {
     this._pokemonSelected = pokemonName;
     this._selected = true;
 
@@ -68,7 +85,22 @@ export class GameComponent implements OnInit {
       this.playerService.decreaseLifes();
       console.log('incorrect');
     }
-    
+
+    this.nom=pokemonName
+    for (var i = 0; i < this._pokemon.abilities.length; i++) {
+      await this.promesaPokemonHabilitat(this._pokemon.abilities[i].ability.name).then(
+        (val) => {
+          // this.habilitat= val.name
+          this.habilitat.push(val.name)
+          console.log(val.name)
+          this.desc.push(val.effect_entries[1].effect)
+          console.log(val.effect_entries[1].effect)
+        },
+        (err) => {
+          console.log(err)
+        },
+      )
+    }
   }
 
   // this function es execute every time that user click in next game
@@ -88,5 +120,8 @@ export class GameComponent implements OnInit {
       this.loaded = true;
     }
   }
+
+
+
 
 }
